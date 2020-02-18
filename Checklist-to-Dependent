@@ -1,0 +1,33 @@
+/**
+**	Duplicate and Dependency
+*/
+
+
+KT.Elements.Task.contextMenu.push({
+name: 'Duplicate me!',
+permissions: 'update_tasks',
+action(menu, task, selection){
+
+var mySwimlaneId = prompt("Swimlane:", "1404343");
+
+if (mySwimlaneId != 00000 || mySwimlaneId != null ){
+	selection.groupUpdate({
+	'_action': 'clone',
+	}).done(selection.clear)
+	task.save('swimlane_id', mySwimlaneId)
+	
+	_.delay(function(){
+		task.get('subtasks').forEach(function(item) {
+		const taskDep = KT.tasks.create({
+		board_id:KT.boards.models[0].id,
+		name:item.name,
+		swimlane_id: mySwimlaneId,
+		card_type_id: task.get('card_type_id')
+		})
+		task.addDependent(taskDep.cid)
+		})
+	}, 10000);	// delay
+}else{
+	alert("Invalid Swimlane ID");
+}// if
+}}); //action
